@@ -1,0 +1,42 @@
+# Environment variables
+.env
+*.env
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+.venv/
+
+# SQLite databases (if used locally for testing, though we use MariaDB)
+*.sqlite3
+*.db
+
+# IDE and editor specific files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Flask-Migrate - the versions directory is usually committed,
+# but if it were to contain sensitive data or become very large,
+# one might consider ignoring it in specific scenarios.
+# For now, we commit it.
+# migrations/versions/
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+
+# Coverage reports
+.coverage
+htmlcov/
+coverage.xml
+
+# OS-specific
+.DS_Store
+Thumbs.db
