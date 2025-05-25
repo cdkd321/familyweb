@@ -40,3 +40,9 @@ coverage.xml
 # OS-specific
 .DS_Store
 Thumbs.db
+
+# Pytest
+.pytest_cache/
+htmlcov/ # If generating HTML coverage reports locally
+.coverage # Coverage data file
+# .tox/ # If using tox for test automation
