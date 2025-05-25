@@ -50,6 +50,37 @@ class Member(db.Model):
     def __repr__(self):
         return f'<Member {self.name}>'
 
+    def to_dict(self, include_relationships=False):
+        data = {
+            'id': self.id,
+            'name': self.name,
+            'birth_date': self.birth_date.isoformat() if self.birth_date else None,
+            'death_date': self.death_date.isoformat() if self.death_date else None,
+            'bio': self.bio,
+            'photo_url': self.photo_url,
+            'parent1_id': self.parent1_id,
+            'parent2_id': self.parent2_id,
+            'spouse_id': self.spouse_id
+        }
+        # Basic serialization of children for now, can be expanded
+        if include_relationships:
+            # This could be very large if not handled with care (e.g., depth limiting)
+            # For now, let's just list IDs or names of direct children.
+            children = []
+            if self.children_as_parent1:
+                for child in self.children_as_parent1:
+                    children.append({'id': child.id, 'name': child.name})
+            if self.children_as_parent2:
+                for child in self.children_as_parent2:
+                    if not any(c['id'] == child.id for c in children): # Avoid duplicates
+                        children.append({'id': child.id, 'name': child.name})
+            data['children'] = children
+            
+            # Spouse info
+            if self.spouse:
+                data['spouse_name'] = self.spouse.name # Example of adding related field
+        return data
+
 class FamilyTreeInfo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), nullable=True, default='My Family Tree')

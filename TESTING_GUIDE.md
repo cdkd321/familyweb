@@ -184,3 +184,112 @@ Navigate to `http://localhost:5173/about-family` in your browser.
         *   **Loading State:** The "Update Information" button should show a "Updating..." state and be disabled during the request.
 
 This guide should help in manually verifying the core functionalities implemented so far. As new features are added, this document should be updated.
+
+**III. Frontend Authentication Testing (Phase 2 Updates):**
+
+1.  **Setup:**
+    *   Ensure backend and frontend servers are running.
+    *   Clear browser cache/localStorage if needed for a clean test.
+
+2.  **Registration Page (`/register`):**
+    *   Navigate to `/register`.
+    *   Attempt registration with valid data (new username, new email, password).
+        *   Expected: Success message/redirect to login. User created in DB.
+    *   Attempt registration with an existing username.
+        *   Expected: Error message from backend.
+    *   Attempt registration with an existing email.
+        *   Expected: Error message from backend.
+    *   Attempt registration with invalid email format.
+        *   Expected: Client-side or backend validation error.
+    *   Attempt registration with empty fields.
+        *   Expected: Client-side validation errors.
+
+3.  **Login Page (`/login`):**
+    *   Navigate to `/login`.
+    *   Login with valid credentials (created during registration or backend setup).
+        *   Expected: Redirect to an authenticated page (e.g., `/about-family` or `/members`). "Login" / "Register" links in `App.vue` replaced by "Username", "Account", "Logout". Token stored in localStorage.
+    *   Login with invalid username or password.
+        *   Expected: Error message.
+    *   Accessing `/login` or `/register` when already logged in.
+        *   Expected: Redirect to an authenticated page.
+
+4.  **Logout:**
+    *   Click the "Logout" button/link.
+        *   Expected: Redirect to `/login`. Token removed from localStorage. Authenticated links in `App.vue` replaced by "Login" / "Register".
+
+5.  **Route Protection:**
+    *   Attempt to access a protected route (e.g., `/members`, `/account`, `/family-tree`, `/about-family`) when not logged in.
+        *   Expected: Redirect to `/login`.
+    *   After logging in, access these routes again.
+        *   Expected: Successful navigation and page display.
+
+**IV. Backend Member API Testing (Phase 2 - if not fully covered or for direct API tests):**
+    *   (Assume user is authenticated with a token for protected endpoints, role 'admin' or 'editor' as needed)
+    *   **Create Member (`POST /api/members`):**
+        *   Valid data, including `parent1_id`, `parent2_id`, `spouse_id` (use existing member IDs or null).
+        *   Expected: 201, member data returned.
+        *   Invalid data (e.g., non-existent parent ID). Expected: 400/404 error.
+        *   Without token or with insufficient role. Expected: 401/403.
+    *   **List Members (`GET /api/members`):** Expected: 200, list of members.
+    *   **Get Member (`GET /api/members/<id>`):** Expected: 200, specific member data. 404 if not found.
+    *   **Update Member (`PUT /api/members/<id>`):**
+        *   Valid data. Expected: 200, updated member data.
+        *   Without token or with insufficient role. Expected: 401/403.
+    *   **Delete Member (`DELETE /api/members/<id>`):**
+        *   Expected: 200/204. Member removed.
+        *   Without token or with insufficient role. Expected: 401/403.
+
+**V. Frontend Member Management Testing:**
+
+1.  **Member List Page (`/members`):**
+    *   Navigate to `/members`.
+    *   Expected: List of members displayed. "Add New Member", "View", "Edit", "Delete" actions visible (Edit/Delete/Add might depend on role - 'admin'/'editor').
+    *   If no members: Appropriate message.
+    *   **Delete Member:** Click "Delete" for a member. Confirm.
+        *   Expected: Member removed from list and backend.
+    *   Click "Add New Member". Expected: Navigate to member creation form.
+
+2.  **Member Create/Edit Form (`/members/new`, `/members/edit/:id`):**
+    *   **Create:**
+        *   Fill form with valid data. Select parents/spouse from dropdowns. Save.
+        *   Expected: Member created. Redirect to list or detail page. New member appears.
+        *   Attempt to create with invalid data (e.g., name empty). Expected: Client-side validation.
+        *   Attempt to set self as parent/spouse. Expected: Client-side validation.
+    *   **Edit:**
+        *   Navigate to edit form for an existing member.
+        *   Expected: Form pre-filled with member's data.
+        *   Modify data. Save.
+        *   Expected: Member updated. Redirect. Changes reflected.
+        *   Dropdowns for parents/spouse should not contain the member being edited.
+
+3.  **Member Detail Page (`/members/:id`):**
+    *   Navigate by clicking "View" on member list or directly.
+    *   Expected: All member details displayed correctly, including names/links for parents, spouse, children.
+    *   "Edit Member" button visible to authorized users.
+
+**VI. Family Tree Visualization Testing (`/family-tree`):**
+
+1.  **Navigate to `/family-tree` (when logged in).**
+    *   Expected: Tree displays correctly based on parent-child relationships. Member names visible. Links to detail pages work.
+    *   If no members or no relationships: Appropriate message or basic display.
+    *   Test with various scenarios: single root, multiple roots, members with one parent, two parents.
+
+**VII. Account Management - Change Password Testing:**
+
+1.  **Backend API (`POST /auth/change-password` - if testing directly):**
+    *   With valid token:
+        *   Correct `current_password`, valid `new_password`. Expected: 200, success.
+        *   Incorrect `current_password`. Expected: 400/401 error.
+        *   Missing fields. Expected: 400 error.
+    *   Without token. Expected: 401.
+
+2.  **Frontend Account Page (`/account`):**
+    *   Navigate to `/account` (when logged in).
+    *   **Valid Change:** Enter correct current password, new password, and matching confirmation. Submit.
+        *   Expected: Success message. Password changed (verify by logging out and back in with new password). Form cleared.
+    *   **Incorrect Current Password:**
+        *   Expected: Error message.
+    *   **New Passwords Don't Match:**
+        *   Expected: Client-side error message.
+    *   **Empty Fields:**
+        *   Expected: Client-side error messages.

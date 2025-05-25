@@ -4,7 +4,17 @@
       <nav>
         <router-link to="/">Home (Placeholder)</router-link> |
         <router-link to="/about-family">About Our Family</router-link>
-        <!-- Add other global navigation links here -->
+        <router-link v-if="authStore.isAuthenticated" to="/members"> | Members</router-link>
+        <router-link v-if="authStore.isAuthenticated" to="/family-tree"> | Family Tree</router-link>
+
+        <span v-if="authStore.isAuthenticated" class="auth-links">
+          | Logged in as: <strong>{{ authStore.user?.username }}</strong>
+          (<router-link to="/account">Account</router-link> | <a @click="handleLogout" href="#">Logout</a>)
+        </span>
+        <span v-else class="auth-links">
+          | <router-link to="/login">Login</router-link> |
+          <router-link to="/register">Register</router-link>
+        </span>
       </nav>
     </header>
     <main>
@@ -17,7 +27,15 @@
 </template>
 
 <script setup>
-// No specific script needed for this basic App.vue layout
+import { useAuthStore } from '@/stores/authStore';
+import router from './router'; // Import router for navigation on logout
+
+const authStore = useAuthStore();
+
+function handleLogout() {
+  authStore.logout();
+  // Navigation to login is handled by the store's logout action now
+}
 </script>
 
 <style>
@@ -42,12 +60,17 @@ nav {
 nav a {
   font-weight: bold;
   color: #2c3e50;
-  margin: 0 15px;
+  margin: 0 5px; /* Adjusted margin for tighter spacing */
   text-decoration: none;
 }
 
 nav a.router-link-exact-active {
   color: #42b983;
+}
+
+.auth-links a {
+  cursor: pointer;
+  text-decoration: underline;
 }
 
 main {

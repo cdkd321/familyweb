@@ -17,11 +17,15 @@ def create_app():
     jwt.init_app(app)
 
     # Register blueprints here
-    # Assuming routes.py is in the same directory
-    from routes import main_bp, auth_bp, family_tree_info_bp 
+    from routes import main_bp # main_bp might still be in backend/routes.py
+    from routes.auth_routes import auth_bp
+    from routes.family_tree_info_routes import family_tree_info_bp
+    from routes.member_routes import member_bp # Import member_bp
+
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(family_tree_info_bp)
+    app.register_blueprint(member_bp) # Register member_bp
 
     return app
 
